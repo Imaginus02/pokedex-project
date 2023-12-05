@@ -89,7 +89,7 @@ Fonctionnement du programme dorénavant :
 - Si on spécifie le fichier de base de données après l'ID du pokémon voulu
 
 ```
-$ PokedexApplication <pokemonId> <databaseFile>
+$ PokedexApplication <pokemonId> -d <databaseFile>
 =============================
 Pokémon # 1
 Nom : Bulbizarre
@@ -133,13 +133,33 @@ devrait se faire sans problème. Créez deux implémentations de votre interface
 selon les conditions d'appel du programmes, injectez une instance de l'une ou de l'autre à votre controller. 
 
 
-### 3) Une nouvelle sortie du programme
+### 3) Le choix du format de sortie
 
-On veut désormais que notre programme donne une description texte du pokémon en console (comportement actuel), mais
-aussi qu'il génère un document HTML avec la description du pokémon. Le HTML est généré dans un fichier `output.html`
-dans le dossier d'exécution.
+On souhaite que l'utilisateur puisse choisir le format auquel le programme affiche le pokémon.
+Les choix sont les suivants :
 
-Le format de la sortie :
+- texte (format tel qu'implémenté depuis le début de ce TP)
+- HTML
+- CSV
+
+Le choix du format de sortie se détermine en utilisant l'option en ligne de commande
+`-f <format>`, avec les valeurs `text`, `html`, ou `csv`. Par défaut si l'option
+n'est pas spécifiée, le format de sortie est `text`.
+
+#### Sortie texte
+
+```
+=============================
+Pokémon # 1
+Nom : Bulbizarre
+Taille : 7
+Poids : 69
+Description : Il a une étrange graine plantée sur son dos. Elle grandit avec lui depuis la naissance.
+=============================
+```
+
+#### Sortie HTML
+
 
 ```
 <h1>Bulbizarre</h1>
@@ -151,126 +171,31 @@ Le format de la sortie :
 </ul>
 ```
 
-Pour ce faire, réutilisez le code proposé ci dessous : 
+#### Sortie CSV
 
-Dans un package `utilities`, fichier `ConsoleLogUtility.java` :
-
-```java
-package com.example.pokedex.utilities;
-
-public class ConsoleLogUtility {
-    public static void logTextToConsole(OutputGeneratorInterface generator) {
-        System.out.println(generator.generateText());
-    }
-}
+```
+Id;Name;Height;Weight;Description;
+1;"Bulbizarre";7;69;"Il a une étrange graine plantée sur son dos. Elle grandit avec lui depuis la naissance."
 ```
 
-Le fichier `FileLogUtility.java`
 
-```java
-package com.example.pokedex.utilities;
+C'est votre classe du package `views` qui va gérer ces différents format de sortie 
+(par exemple elle pourrait s'appeler `PokemonView`).
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+Vous allez pouvoir utiliser le code fourni dans le package `utilities`, et décommenter
+la dernière ligne de code du main() :
 
-public class FileLogUtility {
-    public static void logHtmlToFile(String filePath, OutputGeneratorInterface generator) throws IOException {
-        Files.write(Paths.get(filePath), generator.generateHtml().getBytes(StandardCharsets.UTF_8));
-    }
-}
+```java 
+ConsoleOutputUtility consoleOutputUtility = new ConsoleOutputUtility(outputFormat, /* PokemonView instance */);
 ```
 
-Et le fichier `OutputGeneratorInterface.java` 
+Votre classe `pokemonView` doit implémenter l'interface `MultipleFormatGenerator`. En l'état
+celà ne respecte pas le principe "Interface Segregation". 
 
-```java
-package com.example.pokedex.utilities;
-
-public interface OutputGeneratorInterface {
-    public String generateText();
-    public String generateHtml();
-}
-```
-
-Le code source proposé ne respecte pas le principe "Interface Segregation". Refactorez le pour que le principe soi respecté,
-puis intégrez le à votre code existant. A priori, ce sera votre classe "view" qui prendra le role du `generator`, et qui devra
-implémenter les interfaces que vous aurez définies.
-
-### 4) Écriture d'un test unitaire  (pas à faire pour le TP 2022-2023)
+Refactorez les sources du package `utilities`, afin que le principe "Interface Segretation"
+soit respecté.
 
 
-Nous allons faire un test unitaire sur notre classe "controller". Comme nous avons respecté le principe "Dependency Inversion",
-nous allons pouvoir substituer facilement la dépendance de la classe controller à la classe service.
-
-Voici ci dessous un exemple d'implémentation du test unitaire, à adapter à votre code. 
-
-Fichier `PokemonsControllerTest.java`, à situer sous le dossier `test` de votre projet gradle (voir l'annexe du sujet sur JUnit)
-
-```java
-package com.example.pokedex.controllers;
-
-import com.example.pokedex.models.AdvancedPokemon;
-import com.example.pokedex.models.Pokemon;
-import com.example.pokedex.services.PokemonData;
-import com.example.pokedex.services.PokemonFetcherInterface;
-import org.junit.Assert;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
-
-public class PokemonsControllerTest {
-
-    /**
-     * Ce test vérifie que la méthode `getPokemon` de la classe {@link PokemonsController}
-     * renvoie bien une instance de la classe {@link AdvancedPokemon}, dans le cas où le service
-     * qui implémente l'interface {@link PokemonFetcherInterface} renvoit bien des données qui comprennent
-     * une description de pokémon.
-     * (dans le cas contraire, c'est une instance de la classe {@link Pokemon} qui serait renvoyée).
-     *
-     * Pour celà nous implémentons un service mock, qui implémente l'interface {@link PokemonFetcherInterface}
-     * et qui renvoit un jeu de données de test, comprenant une description de pokémon.
-     *
-     * Le test vérifie ensuite que l'instance AdvancedPokemon a bien tous les attributs
-     * aux valeurs attendues, compte tenu des données de tests renvoyées par notre mock.
-     */
-    @Test
-    public void getPokemon() {
-        PokemonsController pokemonsController = new PokemonsController(new PokemonFetcherMock());
-        Pokemon pokemon = null;
-
-        try {
-            pokemon = pokemonsController.getPokemon(2);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        /**
-         * The fetcher returned a description, test that the controller returns an instance
-         * of AdvancedPokemon
-         */
-        Assert.assertTrue(pokemon instanceof AdvancedPokemon);
-        AdvancedPokemon advancedPokemon = (AdvancedPokemon) pokemon;
-
-        /**
-         * Test that the controller created the pokemon instance with all
-         * the correct data
-         */
-        Assert.assertEquals(2, pokemon.getId());
-        Assert.assertEquals("Poketest", pokemon.getName());
-        Assert.assertEquals(22, pokemon.getHeight());
-        Assert.assertEquals(33, pokemon.getWeight());
-        Assert.assertEquals("Poke test description", advancedPokemon.getDescription());
-
-    }
-
-    class PokemonFetcherMock implements PokemonFetcherInterface {
-        // TODO
-    }
-}
-```
-
-Adaptez le code ci dessus à votre code existant.
 
 ## Consignes pour le rendu
 
@@ -287,7 +212,7 @@ Consignes supplémentaires :
 - Pour les commentaires, suivre le standard Javadoc permet de structurer ses commentaires (et éventuellement de génerer de la documentation).
 - Prenez l'habitude de coder en anglais, que ce soit pour le nommage de vos élément ou le commentaire du code.
 
-Date de rendu : 1er janvier 2023 (à minuit).
+Date de rendu : 14 janvier 2023 (à minuit).
 
 
 Méthode de rendu : envoyez le projet dans une archive par email à qrichaud.pro@gmail.com, ou mettez le sur un repo git à cloner 
@@ -340,16 +265,7 @@ qui retourne un objet JSON, assez gros, mais dont seulement le sous ensemble sui
 }
 ```
 
-### Tests unitaires
 
-
-Un exemple de test unitaire est fourni dans le projet de départ. On utilise JUnit4 (attention, syntaxe différente des versions inférieures de 
-JUnit, pensez y quand vous cherchez de la doc en ligne sur JUnit).
-
-Dans IntelliJ, on peut génerer automatiquement le fichier de test unitaire pour une classe avec le raccourci Ctrl+Maj+T (ou menu contextuel "Go to" -> "Test")
-lorsqu'on se trouve dans le corps de la classe en question.
-
-Exemple de tuto sur JUnit : <https://www.vogella.com/tutorials/JUnit/article.html>
 
 ### Gradle avec Intellij
 
