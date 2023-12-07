@@ -1,5 +1,7 @@
 package com.example.pokedex.utilities;
 
+import com.example.pokedex.models.OutputFormat;
+
 public class ConsoleOutputUtility {
     OutputFormat outputFormat;
     MultipleFormatGenerator formatsGenerator;

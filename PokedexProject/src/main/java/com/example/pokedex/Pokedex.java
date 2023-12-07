@@ -1,8 +1,10 @@
 package com.example.pokedex;
 
 
-import com.example.pokedex.utilities.ConsoleOutputUtility;
-import com.example.pokedex.utilities.OutputFormat;
+import com.example.pokedex.models.OutputFormat;
+import com.example.pokedex.models.Pokemon;
+import com.example.pokedex.services.HTTPData;
+import com.example.pokedex.views.TextDisplayer;
 import org.apache.commons.cli.*;
 
 public class Pokedex {
@@ -13,6 +15,11 @@ public class Pokedex {
     private static String databasePath;
     private static OutputFormat outputFormat = OutputFormat.TEXT;
     private static int pokemonId;
+
+    private static Pokemon pokemon;
+
+    private static final TextDisplayer textDisplayer = new TextDisplayer();
+    private static final HTTPData httpData = new HTTPData();
 
     public static void main(String[] args) throws ParseException {
 
@@ -31,17 +38,26 @@ public class Pokedex {
            Demo of the command line parsing result, you have access to these static attributes, remove
            this block of code in your application.
          */
-        System.out.println("Pokemon ID : " + pokemonId);
-        System.out.println("Database source : " + dataSource);
-        System.out.println("Database file path : " + databasePath);
-        System.out.println("Output format : " + outputFormat);
+//        System.out.println("Pokemon ID : " + pokemonId);
+//        System.out.println("Database source : " + dataSource);
+//        System.out.println("Database file path : " + databasePath);
+//        System.out.println("Output format : " + outputFormat);
 
+        if (dataSource == DataSource.WEB_API) {
+            httpData.getData();
+            pokemon = httpData.createPokemon();
+        }
+
+        if (outputFormat == OutputFormat.TEXT) {
+            textDisplayer.generateOutput(pokemon);
+            textDisplayer.output();
+        }
         /*
             Demo of using a web API and a local SQLite database, remove this block of code in your
             application
          */
-        SQLLiteExample.run();
-        HTTPRequestExample.run();
+//        SQLLiteExample.run();
+//        HTTPRequestExample.run();
 
 
         // Uncomment this when you are at part 3 of the assignment

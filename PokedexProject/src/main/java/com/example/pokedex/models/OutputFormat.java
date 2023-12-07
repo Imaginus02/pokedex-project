@@ -1,4 +1,4 @@
-package com.example.pokedex.utilities;
+package com.example.pokedex.models;
 
 public enum OutputFormat {
     TEXT, HTML, CSV
