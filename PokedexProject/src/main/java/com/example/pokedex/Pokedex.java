@@ -6,7 +6,8 @@ import com.example.pokedex.models.OutputFormat;
 import com.example.pokedex.models.Pokemon;
 import com.example.pokedex.services.HTTPData;
 import com.example.pokedex.services.SQLData;
-import com.example.pokedex.views.TextDisplayer;
+import com.example.pokedex.utilities.ConsoleOutputUtility;
+import com.example.pokedex.views.PokemonView;
 import org.apache.commons.cli.*;
 
 public class Pokedex {
@@ -14,14 +15,14 @@ public class Pokedex {
     private static DataSource dataSource = DataSource.WEB_API;
     private static OutputFormat outputFormat = OutputFormat.TEXT;
     private static Long pokemonId;
-    private static String databasePath;
+    private static String databasePath = "pokemondatabase.sqlite";
     private static Pokemon pokemon;
-    private static final TextDisplayer textDisplayer = new TextDisplayer();
-    private static SQLData sqlData;
-    private static HTTPData httpData;
+
 
     public static void main(String[] args) throws ParseException {
-
+        PokemonView pokemonView;
+        SQLData sqlData;
+        HTTPData httpData;
         /* Parse the command line arguments, this is done for you, keep this code block */
         try {
             parseCommandLineArguments(args);
@@ -32,16 +33,9 @@ public class Pokedex {
             System.exit(0);
         }
 
-
         /*
-           Demo of the command line parsing result, you have access to these static attributes, remove
-           this block of code in your application.
-         */
-//        System.out.println("Pokemon ID : " + pokemonId);
-//        System.out.println("Database source : " + dataSource);
-//        System.out.println("Database file path : " + databasePath);
-//        System.out.println("Output format : " + outputFormat);
-
+        * Gather the data
+        */
         if (dataSource == DataSource.WEB_API) {
             httpData = new HTTPData();
             httpData.getData((long) pokemonId);
@@ -52,24 +46,16 @@ public class Pokedex {
             pokemon = sqlData.createPokemon();
         }
 
-        if (outputFormat == OutputFormat.TEXT) {
-            textDisplayer.generateOutput(pokemon);
-            textDisplayer.output();
-        } else if (outputFormat == OutputFormat.CSV) {
-
-        } else if (outputFormat == OutputFormat.HTML) {
-
-        }
         /*
-            Demo of using a web API and a local SQLite database, remove this block of code in your
-            application
-         */
-//        SQLLiteExample.run();
-//        HTTPRequestExample.run();
+        * Create the view of the Pokémon
+        */
+        pokemonView = new PokemonView(pokemon);
 
-
-        // Uncomment this when you are at part 3 of the assignment
-        //ConsoleOutputUtility consoleOutputUtility = new ConsoleOutputUtility(outputFormat, /* PokemonView instance */);
+        /*
+        * Write to the console
+        */
+        ConsoleOutputUtility consoleOutputUtility = new ConsoleOutputUtility(outputFormat, pokemonView);
+        consoleOutputUtility.makeOutput();
     }
 
     public static void parseCommandLineArguments(String[] args) throws PokemonCommandLineParsingException, ParseException {

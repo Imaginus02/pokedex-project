@@ -1,6 +1,5 @@
 package com.example.pokedex.services;
 
-import com.example.pokedex.models.DataSource;
 import com.example.pokedex.models.Pokemon;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;

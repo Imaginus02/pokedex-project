@@ -5,6 +5,7 @@ import com.example.pokedex.models.OutputFormat;
 public class ConsoleOutputUtility {
     OutputFormat outputFormat;
     MultipleFormatGenerator formatsGenerator;
+
     public ConsoleOutputUtility(OutputFormat outputFormat, MultipleFormatGenerator formatsGenerator) {
         this.outputFormat = outputFormat;
         this.formatsGenerator = formatsGenerator;

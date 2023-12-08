@@ -14,7 +14,6 @@ public class Pokemon {
         return id;
     }
 
-
     public String getName() {
         return name;
     }

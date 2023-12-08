@@ -1,10 +1,9 @@
 package com.example.pokedex.models;
 
-public class PokemonDescripted extends Pokemon{
+public class PokemonDescripted extends Pokemon {
 
     private final String description;
     private final DataSource dataSource;
-
 
     public String getDescription() {
         return description;
