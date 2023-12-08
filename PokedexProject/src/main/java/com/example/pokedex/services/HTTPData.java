@@ -53,8 +53,6 @@ public class HTTPData implements CreateData {
         return new Pokemon((Long) this.finalObject.get("id"),
                 (String) this.finalObject.get("name"),
                 (Long) this.finalObject.get("height"),
-                (Long) this.finalObject.get("weight"),
-                (String) this.finalObject.get("description"),
-                DataSource.WEB_API);
+                (Long) this.finalObject.get("weight"));
     }
 }

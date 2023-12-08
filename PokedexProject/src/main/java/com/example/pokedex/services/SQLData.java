@@ -2,6 +2,7 @@ package com.example.pokedex.services;
 
 import com.example.pokedex.models.DataSource;
 import com.example.pokedex.models.Pokemon;
+import com.example.pokedex.models.PokemonDescripted;
 
 import java.sql.*;
 
@@ -39,9 +40,9 @@ public class SQLData implements CreateData{
     }
 
     @Override
-    public Pokemon createPokemon() {
+    public PokemonDescripted createPokemon() {
         try {
-            return new Pokemon(resultSet.getLong("id"),
+            return new PokemonDescripted(resultSet.getLong("id"),
                     resultSet.getString("name"),
                     resultSet.getLong("height"),
                     resultSet.getLong("weight"),
