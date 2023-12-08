@@ -4,7 +4,7 @@ import com.example.pokedex.models.Pokemon;
 
 public interface CreateData {
 
-    public void getData();
+    public void getData(Long id);
 
     public Pokemon createPokemon();
 }

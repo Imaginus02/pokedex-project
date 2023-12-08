@@ -16,29 +16,25 @@ import java.io.IOException;
 public class HTTPData implements CreateData {
 
     private final CloseableHttpClient httpClient;
-    private final HttpGet request;
-    private HttpResponse response;
 
-    private final JSONParser parser;
-    private Object resultObject;
     private JSONObject finalObject;
 
     public HTTPData() {
         this.httpClient = HttpClientBuilder.create().build();
-        this.request = new HttpGet("https://pokeapi.co/api/v2/pokemon/1");
-        this.parser = new JSONParser();
-        request.addHeader("content-type", "application/json");
     }
 
     @Override
-    public void getData() {
+    public void getData(Long id) {
+        HttpGet request = new HttpGet("https://pokeapi.co/api/v2/pokemon/" + id.toString());
+        JSONParser parser = new JSONParser();
+        request.addHeader("content-type", "application/json");
         String jsonResponse = "";
         try {
-            response = this.httpClient.execute(request);
-            jsonResponse = EntityUtils.toString(this.response.getEntity(), "UTF-8");
-            this.resultObject = parser.parse(jsonResponse);
-            if (this.resultObject instanceof JSONObject) {
-                this.finalObject = (JSONObject) this.resultObject;
+            HttpResponse response = this.httpClient.execute(request);
+            jsonResponse = EntityUtils.toString(response.getEntity(), "UTF-8");
+            Object resultObject = parser.parse(jsonResponse);
+            if (resultObject instanceof JSONObject) {
+                this.finalObject = (JSONObject) resultObject;
             } else {
                 System.err.println("Error, we expected a JSON Object from the API");
             }
@@ -56,7 +52,7 @@ public class HTTPData implements CreateData {
     public Pokemon createPokemon() {
         return new Pokemon((Long) this.finalObject.get("id"),
                 (String) this.finalObject.get("name"),
-                (Long) this.finalObject.get("size"),
+                (Long) this.finalObject.get("height"),
                 (Long) this.finalObject.get("weight"),
                 (String) this.finalObject.get("description"),
                 DataSource.WEB_API);

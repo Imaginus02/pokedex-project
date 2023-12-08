@@ -1,25 +1,24 @@
 package com.example.pokedex;
 
 
+import com.example.pokedex.models.DataSource;
 import com.example.pokedex.models.OutputFormat;
 import com.example.pokedex.models.Pokemon;
 import com.example.pokedex.services.HTTPData;
+import com.example.pokedex.services.SQLData;
 import com.example.pokedex.views.TextDisplayer;
 import org.apache.commons.cli.*;
 
 public class Pokedex {
 
-    private enum DataSource {WEB_API, LOCAL_DATABASE}
-
     private static DataSource dataSource = DataSource.WEB_API;
-    private static String databasePath;
     private static OutputFormat outputFormat = OutputFormat.TEXT;
-    private static int pokemonId;
-
+    private static Long pokemonId;
+    private static String databasePath;
     private static Pokemon pokemon;
-
     private static final TextDisplayer textDisplayer = new TextDisplayer();
-    private static final HTTPData httpData = new HTTPData();
+    private static SQLData sqlData;
+    private static HTTPData httpData;
 
     public static void main(String[] args) throws ParseException {
 
@@ -44,13 +43,22 @@ public class Pokedex {
 //        System.out.println("Output format : " + outputFormat);
 
         if (dataSource == DataSource.WEB_API) {
-            httpData.getData();
+            httpData = new HTTPData();
+            httpData.getData((long) pokemonId);
             pokemon = httpData.createPokemon();
+        } else if (dataSource == DataSource.LOCAL_DATABASE) {
+            sqlData = new SQLData(databasePath);
+            sqlData.getData((long) pokemonId);
+            pokemon = sqlData.createPokemon();
         }
 
         if (outputFormat == OutputFormat.TEXT) {
             textDisplayer.generateOutput(pokemon);
             textDisplayer.output();
+        } else if (outputFormat == OutputFormat.CSV) {
+
+        } else if (outputFormat == OutputFormat.HTML) {
+
         }
         /*
             Demo of using a web API and a local SQLite database, remove this block of code in your
@@ -96,7 +104,7 @@ public class Pokedex {
             throw new PokemonCommandLineParsingException("You must provide a pokemon ID", options);
         }
         try {
-            pokemonId = Integer.parseInt(remainingArgs[0]);
+            pokemonId = (long) Integer.parseInt(remainingArgs[0]);
         } catch (NumberFormatException e) {
             throw new PokemonCommandLineParsingException("'" + remainingArgs[0] + "' is not a valid pokemon ID", options);
         }
@@ -116,5 +124,7 @@ public class Pokedex {
             return options;
         }
 
-    };
+    }
+
+    ;
 }
