@@ -12,16 +12,29 @@ import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 
+/**
+ * HTTPData class implements the CreateData interface and provides methods to fetch Pokémon data
+ * from the PokeAPI using HTTP requests.
+ * The class uses Apache HttpClient to make HTTP requests and the JSONParser to parse the JSON response.
+ */
 public class HTTPData implements CreateData {
 
     private final CloseableHttpClient httpClient;
 
     private JSONObject finalObject;
 
+    /**
+     * Constructs an HTTPData object with a CloseableHttpClient for making HTTP requests.
+     */
     public HTTPData() {
         this.httpClient = HttpClientBuilder.create().build();
     }
 
+    /**
+     * Fetches Pokémon data from the PokeAPI based on the provided ID.
+     *
+     * @param id The ID of the Pokémon to fetch.
+     */
     @Override
     public void getData(Long id) {
         HttpGet request = new HttpGet("https://pokeapi.co/api/v2/pokemon/" + id.toString());
@@ -47,6 +60,11 @@ public class HTTPData implements CreateData {
         }
     }
 
+    /**
+     * Creates a Pokémon object based on the fetched data.
+     *
+     * @return A Pokémon object representing the fetched data.
+     */
     @Override
     public Pokemon createPokemon() {
         return new Pokemon((Long) this.finalObject.get("id"),

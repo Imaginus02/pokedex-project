@@ -18,12 +18,11 @@ After cloning this repository, if you have a Java environment on your machine, y
 To run the application with command line arguments :
 
 ```
-./gradlew run --args="premierArgument secondArgument"
+./gradlew run --args="<pokemonId> [-d <databasePath>] [-f <html/csv/text>]"
 ```
 
-
-# Run the tests
-
+# Generate documentation
 ```
-./gradlew test
+./gradlew javadoc
 ```
+Then open [/build/docs/javadoc/index.html](./build/docs/javadoc/index.html) with your favorite web browser 

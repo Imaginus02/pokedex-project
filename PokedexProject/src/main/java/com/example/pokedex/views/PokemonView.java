@@ -5,14 +5,28 @@ import com.example.pokedex.models.Pokemon;
 import com.example.pokedex.models.PokemonDescripted;
 import com.example.pokedex.utilities.MultipleFormatGenerator;
 
+/**
+ * PokemonView class implements the MultipleFormatGenerator interface and provides methods to generate
+ * human-readable text, CSV, and HTML representations of Pokémon information.
+ */
 public class PokemonView implements MultipleFormatGenerator {
 
     private final Pokemon pokemon;
 
+    /**
+     * Constructs a PokemonView object with the specified Pokémon.
+     *
+     * @param pokemon The Pokémon for which the view is created.
+     */
     public PokemonView(Pokemon pokemon) {
         this.pokemon = pokemon;
     }
 
+    /**
+     * Generates a human-readable text representation of the Pokémon.
+     *
+     * @return The human-readable text representation.
+     */
     @Override
     public String generateHumanReadableText() {
         String output = "";
@@ -20,7 +34,7 @@ public class PokemonView implements MultipleFormatGenerator {
         output += "Pokémon # " + pokemon.getId().toString() + "\n";
         output += "Nom : " + pokemon.getName() + "\n";
         output += "Taille : " + pokemon.getSize() + "\n";
-        output += "Poid : " + pokemon.getWeight() + "\n";
+        output += "Poids : " + pokemon.getWeight() + "\n";
         if (pokemon instanceof PokemonDescripted) {
             if (((PokemonDescripted) pokemon).getDataSource() == DataSource.LOCAL_DATABASE)
                 output += "Description : " + ((PokemonDescripted) pokemon).getDescription() + "\n";
@@ -29,6 +43,11 @@ public class PokemonView implements MultipleFormatGenerator {
         return output;
     }
 
+    /**
+     * Generates a CSV representation of the Pokémon.
+     *
+     * @return The CSV representation.
+     */
     public String generateCSV() {
         String output = "Id;Name;Height;Weight";
         if (pokemon instanceof PokemonDescripted) {
@@ -48,6 +67,11 @@ public class PokemonView implements MultipleFormatGenerator {
         return output;
     }
 
+    /**
+     * Generates an HTML representation of the Pokémon.
+     *
+     * @return The HTML representation.
+     */
     public String generateHTML() {
         /*
          *<h1>name</h1>
